@@ -71,7 +71,7 @@ you match output against a regular expression:
           puts "Success!"
         end
         .
-        on.stdout.match /([0-9]+)%/, in: :line do |progress|
+        on.stdout.match /([0-9]+)%/, in: :line do |match, progress|
           puts "Percentage: #{progress}"
         end
       end
