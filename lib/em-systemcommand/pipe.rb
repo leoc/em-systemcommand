@@ -30,7 +30,7 @@ module EventMachine
       # Invoked when line was received
       def receive_line line
         receive_line_callbacks.each do |callback|
-          callback.call line
+          callback.call line.dup
         end
       end
 
@@ -41,9 +41,9 @@ module EventMachine
 
       # Invoked when a line was written, but `\r` was received without
       # a line-break in the end.
-      def receive_update line
+      def receive_update buffer
         receive_update_callbacks.each do |callback|
-          callback.call line
+          callback.call buffer.dup
         end
       end
 
@@ -53,34 +53,38 @@ module EventMachine
       end
 
       # Invoked when data was received.
-      def receive_data data
-        receive_data_callbacks.each do |callback|
-          callback.call data
+      def receive_data data, recursive = false
+        unless recursive
+          receive_data_callbacks.each do |callback|
+            callback.call data.dup
+          end
         end
-
         @lt2_linebuffer ||= []
 
         ix = data.index("\r")
-        if ix and data[ix+1] != "\n"
-          @lt2_linebuffer << data[0...ix]
-          ln = @lt2_linebuffer.join
+        if ix && data[ix+1] != "\n"
+          ln = (@lt2_linebuffer << data[0...ix]).join
           @lt2_linebuffer.clear
+          receive_line ln
           @outputbuffer.print ln
           @outputbuffer.pos -= ln.length
-          receive_line ln
           receive_update @outputbuffer.string
-          receive_data data[(ix+1)..-1] # receive rest data
-        elsif ix = data.index("\n")
-          @lt2_linebuffer << data[0...ix]
-          ln = @lt2_linebuffer.join
-          @lt2_linebuffer.clear
-          ln.chomp!
-          @outputbuffer.puts ln
-          receive_line ln
-          receive_update @outputbuffer.string
-          receive_data data[(ix+1)..-1] # receive rest data
+          receive_data data[(ix+1)..-1], true # receive rest data
         else
-          @lt2_linebuffer << data
+          if ix = data.index("\n")
+            ln = (@lt2_linebuffer << data[0...ix]).join
+            @lt2_linebuffer.clear
+            ln.chomp!
+            receive_line ln
+            receive_data data[(ix+1)..-1], true # receive rest data
+          else
+            @lt2_linebuffer << data
+          end
+
+          unless recursive
+            @outputbuffer.puts data
+            receive_update @outputbuffer.string
+          end
         end
       end
 
