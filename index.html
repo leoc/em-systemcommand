@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="EM::SystemCommand : Easy handling of system commands and their output." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>EM::SystemCommand</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/leoc/em-systemcommand">View on GitHub</a>
+
+          <h1 id="project_title">EM::SystemCommand</h1>
+          <h2 id="project_tagline">Easy handling of system commands and their output.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/leoc/em-systemcommand/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/leoc/em-systemcommand/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>EM::SystemCommand</h1>
+
+<p><code>EM::SystemCommand</code> is an <code>popen3</code> abstraction for eventmachine to easily create subprocesses with eventmachine.
+The goal is to provide an easy way to invoke system commands and to read and handle their outputs. When creating an 
+<code>EM::SystemCommand</code> object its basically like a popen. It has <code>#stdin</code>, <code>#stdout</code> and <code>#stderr</code>.
+Which are related to <code>EM::Connection</code>.</p>
+
+<h2>Installation</h2>
+
+<p>Add this line to your application's Gemfile:</p>
+
+<pre><code>gem 'em-systemcommand'
+</code></pre>
+
+<p>And then execute:</p>
+
+<pre><code>$ bundle
+</code></pre>
+
+<p>Or install it yourself as:</p>
+
+<pre><code>$ gem install em-systemcommand
+</code></pre>
+
+<h2>Usage</h2>
+
+<p>To simply run a process you can instatiate an <code>EM::SystemCommand</code>
+object and set up the callbacks in the yielded block.</p>
+
+<pre><code>EM.run do
+  EM::SystemCommand 'my_command' do |on|
+    on.success do |ps|
+      puts "Success!"
+    end
+
+    on.failure do |ps|
+      puts "Failure with status #{ps.status.exitstatus}"
+    end
+  end
+end
+</code></pre>
+
+<p>When you want to retreive output, you can use the methods
+<code>#update</code>, <code>#line</code> and <code>#data</code> on a pipe object like so:</p>
+
+<pre><code>EM.run do
+  EM::SystemCommand 'my_command' do |on|
+    on.success do |ps|
+      puts "Success!"
+    end
+
+    on.stdout.data do |data|
+      puts "Data: #{data}"
+    end
+
+    on.stdout.line do |line|
+      puts "Line: #{line}"
+    end
+
+    # `#output` gets the whole output buffer.
+    # This means, it has theoretically the screen you´d get when
+    # invoking the command in the shell. Although only \r is used.
+    on.stdout.update do |output|
+      puts output
+    end
+  end
+end
+</code></pre>
+
+<p><code>Pipe</code> objects even have a nice convenient method <code>#match</code> which lets
+you match output against a regular expression:</p>
+
+<pre><code>EM.run do
+  EM::SystemCommand 'echo "25%\n"; sleep 1; echo "50%\n"; sleep 1; echo "75%\n"; sleep 1; echo "100%\n"; exit 0;' do |on|
+    on.success do |ps|
+      puts "Success!"
+    end
+    .
+    on.stdout.match /([0-9]+)%/, in: :line do |match, progress|
+      puts "Percentage: #{progress}"
+    end
+  end
+end
+</code></pre>
+
+<h2>Contributing</h2>
+
+<ol>
+<li>Fork it</li>
+<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+<li>Commit your changes (<code>git commit -am 'Added some feature'</code>)</li>
+<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+<li>Create new Pull Request</li>
+</ol>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">EM::SystemCommand maintained by <a href="https://github.com/leoc">leoc</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
