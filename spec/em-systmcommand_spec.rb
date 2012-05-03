@@ -2,10 +2,10 @@ require 'spec_helper'
 
 describe EM::SystemCommand do
 
-  it 'should take a success callback' do
+  it 'should call a success callback when process succeeds' do
     called = false
     EM.run do
-      EM::SystemCommand.new 'echo "123"; exit 0;' do |on|
+      EM::SystemCommand.new 'exit 0;' do |on|
         on.success do |ps|
           called = true
         end
@@ -17,7 +17,18 @@ describe EM::SystemCommand do
     end
   end
 
-  it 'should take a failure callback' do
+  it 'should take a success callback with process as parameter' do
+    EM.run do
+      EM::SystemCommand.new 'exit 0;' do |on|
+        on.success do |ps|
+          EM.stop_event_loop
+          ps.should be_a EM::SystemCommand
+        end
+      end
+    end
+  end
+
+  it 'should call a failure callback when process fails' do
     called = false
     EM.run do
       EM::SystemCommand.new 'echo "123"; exit 1;' do |on|
@@ -28,6 +39,17 @@ describe EM::SystemCommand do
 
       EM.assertions do
         called.should == true
+      end
+    end
+  end
+
+  it 'should take a failure callback with process as parameter' do
+    EM.run do
+      EM::SystemCommand.new 'exit 1;' do |on|
+        on.failure do |ps|
+          EM.stop_event_loop
+          ps.should be_a EM::SystemCommand
+        end
       end
     end
   end

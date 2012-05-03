@@ -45,9 +45,9 @@ module EventMachine
       pipes.delete name
       if pipes.empty?
         if status.exitstatus == 0
-          succeed
+          succeed self
         else
-          fail status
+          fail self
         end
       end
     end
