@@ -59,31 +59,50 @@ module EventMachine
             callback.call data.dup
           end
         end
-        @lt2_linebuffer ||= []
+        @linebuffer ||= []
+        @cr_offset    = 0
 
-        ix = data.index("\r")
-        if ix && data[ix+1] != "\n"
-          ln = (@lt2_linebuffer << data[0...ix]).join
-          @lt2_linebuffer.clear
-          receive_line ln
-          @outputbuffer.print ln
-          @outputbuffer.pos -= ln.length
-          receive_update @outputbuffer.string
-          receive_data data[(ix+1)..-1], true # receive rest data
-        else
-          if ix = data.index("\n")
-            ln = (@lt2_linebuffer << data[0...ix]).join
-            @lt2_linebuffer.clear
-            ln.chomp!
-            receive_line ln
-            receive_data data[(ix+1)..-1], true # receive rest data
+        parse_crlf data
+
+        receive_update @outputbuffer.string unless recursive
+      end
+
+      def parse_cr data, ix
+        ln = (@linebuffer << data[0...ix]).join
+        @linebuffer.clear
+        receive_line ln
+        @outputbuffer.print ln
+        @outputbuffer.pos = @cr_offset
+        parse_crlf data[(ix+1)..-1] # receive rest data
+      end
+
+      def parse_lf data, ix
+        ln = (@linebuffer << data[0...ix]).join
+        @linebuffer.clear
+        ln.chomp!
+        receive_line ln
+        @outputbuffer.print ln
+        @outputbuffer.pos = @outputbuffer.length
+        @outputbuffer.puts
+        @cr_offset = @outputbuffer.pos
+        parse_crlf data[(ix+1)..-1] # receive rest data
+      end
+
+      def parse_crlf data
+        if ilf = data.index("\n")
+          # if we find a LF and that LF is after a CR we first handle
+          # the CR
+          if icr = data.index("\r") and ilf != (icr+1) and icr < ilf
+            parse_cr data, icr
           else
-            @lt2_linebuffer << data
+            parse_lf data, ilf
           end
-
-          unless recursive
-            @outputbuffer.puts data
-            receive_update @outputbuffer.string
+        else
+          if icr = data.index("\r")
+            parse_cr data, icr
+          else
+            @linebuffer << data
+            @outputbuffer.print data
           end
         end
       end

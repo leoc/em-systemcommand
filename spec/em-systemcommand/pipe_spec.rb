@@ -2,6 +2,19 @@ require 'spec_helper'
 
 describe 'Pipe' do
 
+  context '#receive_data' do
+    it 'should correctly do a carriage return in the output buffer' do
+      EM.run do
+        EM::SystemCommand.new %q{ruby -e '$stdout.sync = true; print "12345\r"; puts "321"; print "123"; print "\r3210"; exit 0;'} do |on|
+          on.success do |process|
+            EM.stop_event_loop
+            process.stdout.output.should == "32145\n3210"
+          end
+        end
+      end
+    end
+  end
+
   context '#data callback' do
 
     it 'should be called on data' do
@@ -58,7 +71,7 @@ describe 'Pipe' do
     it 'should be called on carriage return' do
       received = []
       EM.run do
-        EM::SystemCommand.new "echo -n \"123\r\"; echo -n \"456\r\"" do |on|
+        EM::SystemCommand.new %q{ruby -e '$stdout.sync = true; print "123\r"; print "456\r"; exit 0;'} do |on|
           on.stdout.line do |data|
             received << data
           end
@@ -94,7 +107,7 @@ describe 'Pipe' do
     it 'should be called on carriage return'do
       received = []
       EM.run do
-        EM::SystemCommand.new %q{ruby -e '$stdout.sync = true; print "123\r"; print "456\r"; exit 0;'} do |on|
+        EM::SystemCommand.new %q{ruby -e '$stdout.sync = true; print "123\r"; sleep 0.1; print "456\r"; exit 0;'} do |on|
           on.stdout.update do |data|
             received << data
           end
@@ -130,7 +143,7 @@ describe 'Pipe' do
     it 'should match in output buffer on receive_update' do
       received = []
       EM.run do
-        EM::SystemCommand.new %q{ruby -e '$stdout.sync = true; print "-123-\r"; print "-456-\r"; exit 0'} do |on|
+        EM::SystemCommand.new %q{ruby -e '$stdout.sync = true; print "-123-\r"; sleep 0.1; print "-456-\r"; exit 0'} do |on|
           on.stdout.match /-([0-9]+)-/, in: :output do |match, number|
             received << number
           end
