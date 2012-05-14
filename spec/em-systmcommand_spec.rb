@@ -83,7 +83,7 @@ describe EM::SystemCommand do
       class DummyCmd < EM::SystemCommand;end
     end
 
-    it 'should have default Handlers' do
+    it 'should have default handlers' do
       DummyCmd.pipe_handlers.should == {
         stdin:  EM::SystemCommand::Pipe,
         stdout: EM::SystemCommand::Pipe,
