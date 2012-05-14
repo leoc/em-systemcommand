@@ -1,7 +1,6 @@
 require 'open3'
 
 require "em-systemcommand/version"
-
 require "em-systemcommand/pipe"
 require "em-systemcommand/pipe_handler"
 
@@ -16,18 +15,16 @@ module EventMachine
 
     attr_accessor :pipes, :stdin, :stdout, :stderr
 
-    def initialize *arguments
-
+    def initialize *args, &block
       @pipes = {}
 
-      stdin, stdout, stderr, @wait_thr = Open3.popen3(*arguments)
+      stdin, stdout, stderr, @wait_thr = Open3.popen3 *args
 
       @stdin  = attach_pipe_handler :stdin, stdin
       @stdout = attach_pipe_handler :stdout, stdout
       @stderr = attach_pipe_handler :stderr, stderr
 
       yield self if block_given?
-
     end
 
     def pid
