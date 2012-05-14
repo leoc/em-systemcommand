@@ -78,4 +78,19 @@ describe EM::SystemCommand do
     end
   end
 
+  describe 'subclass' do
+    before :all do
+      class DummyCmd < EM::SystemCommand;end
+    end
+
+    it 'should have default Handlers' do
+      DummyCmd.pipe_handlers.should == {
+        stdin:  EM::SystemCommand::Pipe,
+        stdout: EM::SystemCommand::Pipe,
+        stderr: EM::SystemCommand::Pipe
+      }
+    end
+
+  end
+
 end

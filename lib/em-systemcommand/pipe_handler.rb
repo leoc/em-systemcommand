@@ -24,7 +24,11 @@ module EventMachine
         end
 
         def pipe_handlers
-          @pipe_handlers ||= {}
+          @pipe_handlers ||= {
+            stdin:  EM::SystemCommand::Pipe,
+            stdout: EM::SystemCommand::Pipe,
+            stderr: EM::SystemCommand::Pipe
+          }
         end
 
       end
