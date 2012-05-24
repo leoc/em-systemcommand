@@ -3,6 +3,7 @@ require 'open3'
 require "em-systemcommand/version"
 require "em-systemcommand/pipe"
 require "em-systemcommand/pipe_handler"
+require "em-systemcommand/builder"
 
 module EventMachine
   class SystemCommand
@@ -17,14 +18,36 @@ module EventMachine
 
     def initialize *args, &block
       @pipes = {}
+      @command = EM::SystemCommand::Builder.new *args
 
-      stdin, stdout, stderr, @wait_thr = Open3.popen3 *args
+      @execution_proc = block
+    end
+
+    def self.execute *args, &block
+      sys_cmd = EM::SystemCommand.new *args, &block
+      sys_cmd.execute
+    end
+
+    # Executes the command
+    def execute &block
+      raise 'Previous process still exists' unless pipes.empty?
+
+      # clear callbacks
+      @callbacks = []
+      @errbacks = []
+
+      stdin, stdout, stderr, @wait_thr = Open3.popen3 @command.to_s
 
       @stdin  = attach_pipe_handler :stdin, stdin
       @stdout = attach_pipe_handler :stdout, stdout
       @stderr = attach_pipe_handler :stderr, stderr
 
-      yield self if block_given?
+      if block
+        block.call self
+      elsif @execution_proc
+        @execution_proc.call self
+      end
+      self
     end
 
     def pid
