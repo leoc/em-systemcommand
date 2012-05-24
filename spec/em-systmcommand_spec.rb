@@ -82,6 +82,17 @@ describe EM::SystemCommand do
     end
   end
 
+  it 'should proxy builder commands' do
+    EM.run do
+      cmd = EM::SystemCommand.new 'echo'
+      cmd << '-n'
+      cmd.add 'Something\n'
+      cmd.execute
+      EM.stop_event_loop
+    end
+  end
+
+
   describe 'subclass' do
     before :all do
       class DummyCmd < EM::SystemCommand;end

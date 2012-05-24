@@ -9,6 +9,9 @@ module EventMachine
   class SystemCommand
     include EM::SystemCommand::PipeHandler
     include EM::Deferrable
+    extend Forwardable
+
+    def_delegators :@command, :<<, :add
 
     pipe_handler :stdin,  EM::SystemCommand::Pipe
     pipe_handler :stdout, EM::SystemCommand::Pipe
