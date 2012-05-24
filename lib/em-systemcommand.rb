@@ -19,6 +19,20 @@ module EventMachine
 
     attr_accessor :pipes, :stdin, :stdout, :stderr
 
+    ##
+    # Prepares a `SystemCommand` object.
+    #
+    # An easy way is to use the `Builder` idea:
+    #
+    #     cmd = EM::SystemCommand.new 'echo'
+    #     cmd << :n
+    #     cmd << 'Some text to put out.'
+    #     cmd.execute do |on|
+    #       on.success do
+    #         puts 'Yay!'
+    #       end
+    #     end
+    #
     def initialize *args, &block
       @pipes = {}
       @command = EM::SystemCommand::Builder.new *args
@@ -26,12 +40,18 @@ module EventMachine
       @execution_proc = block
     end
 
+    ##
+    # Convinience method to quickly execute a command.
     def self.execute *args, &block
       sys_cmd = EM::SystemCommand.new *args, &block
       sys_cmd.execute
     end
 
-    # Executes the command
+    ##
+    # Executes the command from the `Builder` object.
+    # If there had been given a block at instantiation it will be
+    # called after the `popen3` call and after the pipes have been
+    # attached.
     def execute &block
       raise 'Previous process still exists' unless pipes.empty?
 
@@ -53,10 +73,20 @@ module EventMachine
       self
     end
 
+    ##
+    # Returns the command string.
+    def command
+      @command.to_s
+    end
+
+    ##
+    # Returns the pid of the child process.
     def pid
       @wait_thr.pid
     end
 
+    ##
+    # Returns the status object of the popen3 call.
     def status
       @wait_thr.value
     end
@@ -64,6 +94,8 @@ module EventMachine
     alias_method :success, :callback
     alias_method :failure, :errback
 
+    ##
+    # Called by child pipes when they get unbound.
     def unbind name
       pipes.delete name
       if pipes.empty?
@@ -75,6 +107,8 @@ module EventMachine
       end
     end
 
+    ##
+    # Kills the child process.
     def kill signal = 'TERM', wait = false
       Process.kill signal, self.pid
       val = status if wait
@@ -83,6 +117,5 @@ module EventMachine
       @stderr.close
       val
     end
-
   end
 end
