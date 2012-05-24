@@ -18,6 +18,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'guard'
   gem.add_development_dependency 'guard-rspec'
+  gem.add_development_dependency 'rake'
 
   gem.add_dependency 'escape'
   gem.add_dependency 'eventmachine'
