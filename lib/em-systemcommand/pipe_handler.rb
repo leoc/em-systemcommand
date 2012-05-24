@@ -14,7 +14,6 @@ module EventMachine
       end
 
       module ClassMethods
-
         def pipe_handler name, klass
           pipe_handlers[name] = klass
         end
@@ -30,7 +29,6 @@ module EventMachine
             stderr: EM::SystemCommand::Pipe
           }
         end
-
       end
     end
   end
