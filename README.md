@@ -25,7 +25,7 @@ To simply run a process you can instatiate an `EM::SystemCommand`
 object and set up the callbacks in the yielded block.
 
     EM.run do
-      EM::SystemCommand 'my_command' do |on|
+      EM::SystemCommand.execute 'my_command' do |on|
         on.success do |ps|
           puts "Success!"
         end
@@ -40,7 +40,7 @@ When you want to retreive output, you can use the methods
 `#update`, `#line` and `#data` on a pipe object like so:
 
     EM.run do
-      EM::SystemCommand 'my_command' do |on|
+      EM::SystemCommand.execute 'my_command' do |on|
         on.success do |ps|
           puts "Success!"
         end
@@ -66,7 +66,7 @@ When you want to retreive output, you can use the methods
 you match output against a regular expression:
 
     EM.run do
-      EM::SystemCommand 'echo "25%\n"; sleep 1; echo "50%\n"; sleep 1; echo "75%\n"; sleep 1; echo "100%\n"; exit 0;' do |on|
+      EM::SystemCommand.execute 'echo "25%\n"; sleep 1; echo "50%\n"; sleep 1; echo "75%\n"; sleep 1; echo "100%\n"; exit 0;' do |on|
         on.success do |ps|
           puts "Success!"
         end
