@@ -1,4 +1,4 @@
-require 'open3'
+require 'posix/spawn'
 
 require "em-systemcommand/version"
 require "em-systemcommand/pipe"
@@ -59,8 +59,9 @@ module EventMachine
       @callbacks = []
       @errbacks = []
 
-      stdin, stdout, stderr, @wait_thr = Open3.popen3 @command.to_s
+      pid, stdin, stdout, stderr = POSIX::Spawn.popen4 @command.to_s
 
+      @pid = pid
       @stdin  = attach_pipe_handler :stdin, stdin
       @stdout = attach_pipe_handler :stdout, stdout
       @stderr = attach_pipe_handler :stderr, stderr
@@ -82,13 +83,13 @@ module EventMachine
     ##
     # Returns the pid of the child process.
     def pid
-      @wait_thr.pid
+      @pid
     end
 
     ##
-    # Returns the status object of the popen3 call.
+    # Returns the status object of the popen4 call.
     def status
-      @wait_thr.value
+      Process.waitpid2(pid)[1]
     end
 
     alias_method :success, :callback
