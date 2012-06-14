@@ -107,7 +107,7 @@ describe EM::SystemCommand do
     end
   end
 
-  it 'should pass multiple command executions', focus: true do
+  it 'should pass multiple command executions' do
     counter = 0
     EM.run do
       2.times do
