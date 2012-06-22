@@ -53,6 +53,13 @@ describe EM::SystemCommand::Builder do
   end
 
   describe '#to_s' do
+    it 'should stay the same' do
+      builder = EM::SystemCommand::Builder.new('echo', 'Irgendwas"$')
+      builder.to_s.should == "echo 'Irgendwas\"$'"
+      builder.to_s.should == "echo 'Irgendwas\"$'"
+      builder.to_s.should == "echo 'Irgendwas\"$'"
+    end
+
     it 'should escape argument strings' do
       EM::SystemCommand::Builder.new('echo', 'Irgendwas"$').to_s.
         should == "echo 'Irgendwas\"$'"

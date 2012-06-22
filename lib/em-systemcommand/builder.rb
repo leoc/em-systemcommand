@@ -30,9 +30,11 @@ module EventMachine
       ##
       # Returns the command string
       def to_s
-        cmd = @arr.shift
+        cmd = ''
         @arr.each do |arg|
-          if arg.is_a?(Array)
+          if arg == @arr.first
+            cmd << arg
+          elsif arg.is_a?(Array)
             param = arg.shift
             param = param.to_s if param.is_a?(Symbol)
             if param =~ /^\-{1,2}(.*)/
