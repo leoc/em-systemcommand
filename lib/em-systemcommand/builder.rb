@@ -35,12 +35,12 @@ module EventMachine
           if arg == @arr.first
             cmd << arg
           elsif arg.is_a?(Array)
-            param = arg.shift
-            param = param.to_s if param.is_a?(Symbol)
+            param, value = arg.first.to_s, arg.last
+
             if param =~ /^\-{1,2}(.*)/
               param = $1
             end
-            value = arg.shift
+
             if param.length == 1
               cmd << ' ' << "-#{param} #{Escape.shell_single_word(value)}"
             else
