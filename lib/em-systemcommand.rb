@@ -89,7 +89,7 @@ module EventMachine
     ##
     # Returns the status object of the popen4 call.
     def status
-      Process.waitpid2(pid)[1]
+      @status ||= Process.waitpid2(pid)[1]
     end
 
     alias_method :success, :callback
