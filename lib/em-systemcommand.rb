@@ -100,6 +100,9 @@ module EventMachine
     def unbind name
       pipes.delete name
       if pipes.empty?
+        exit_callbacks.each do |cb|
+          cb.call status
+        end
         if status.exitstatus == 0
           succeed self
         else
@@ -117,6 +120,19 @@ module EventMachine
       @stdout.close
       @stderr.close
       val
+    end
+
+    ##
+    # A method to add a callback for when the process unbinds.
+    def exit &block
+      exit_callbacks << block
+    end
+
+    ##
+    # An array of exit callbacks, being called with `status` as
+    # parameter when the process is unbound.
+    def exit_callbacks
+      @exit_callbacks ||= []
     end
   end
 end

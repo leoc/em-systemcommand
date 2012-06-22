@@ -2,6 +2,24 @@ require 'spec_helper'
 
 describe EM::SystemCommand do
 
+  it 'should call an exit callback when process is unbound' do
+    called = false
+    exitstatus = nil
+    EM.run do
+      EM::SystemCommand.execute 'exit 0;' do |on|
+        on.exit do |status|
+          called = true
+          exitstatus = status.exitstatus
+        end
+      end
+
+      EM.assertions do
+        called.should == true
+        exitstatus.should == 0
+      end
+    end
+  end
+
   it 'should call a success callback when process succeeds'  do
     called = false
     EM.run do
@@ -107,16 +125,16 @@ describe EM::SystemCommand do
     end
   end
 
-  it 'should pass multiple command executions', focus: true do
+  it 'should pass multiple command executions' do
     counter = 0
     EM.run do
       10.times do
         EM::SystemCommand.execute 'ls' do |on|
           on.success do
-            100.times do
+            10.times do
               EM::SystemCommand.execute 'ls' do |on2|
                 on2.success do
-                  if counter >= 999
+                  if counter >= 99
                     EM.stop_event_loop
                   else
                     counter += 1
@@ -124,7 +142,7 @@ describe EM::SystemCommand do
                 end
 
                 on2.failure do
-                  if counter >= 999
+                  if counter >= 99
                     EM.stop_event_loop
                   else
                     counter += 1
