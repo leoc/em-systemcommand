@@ -35,7 +35,7 @@ module EventMachine
           if arg == @arr.first
             cmd << arg
           elsif arg.is_a?(Array)
-            param, value = arg.first.to_s, arg.last
+            param, value = arg.first.to_s, arg.last.to_s
 
             if param =~ /^\-{1,2}(.*)/
               param = $1
