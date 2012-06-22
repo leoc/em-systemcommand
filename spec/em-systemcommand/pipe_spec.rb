@@ -2,6 +2,27 @@ require 'spec_helper'
 
 describe 'Pipe' do
 
+  context 'parsing' do
+
+    it 'should handle carriage returns' do
+      cmd = EM::SystemCommand.new 'exit 0;'
+      pipe = EM::SystemCommand::Pipe.new(nil, cmd, :stdout)
+      pipe.receive_data "test\n"
+      pipe.receive_data "       32768   0%    0.00kB/s    0:00:00\r"
+      pipe.receive_data "   131235840  12%  125.12MB/s    0:00:06\r"
+      pipe.receive_data "   261619712  25%  124.80MB/s    0:00:05\r"
+      pipe.receive_data "   391544832  38%  124.54MB/s    0:00:04\r"
+      pipe.receive_data "   522616832  51%  124.69MB/s    0:00:03\r"
+      pipe.receive_data "   652738560  63%  124.43MB/s    0:00:02\r"
+      pipe.receive_data "   783056896  76%  124.41MB/s    0:00:01\r"
+      pipe.receive_data "   906657792  88%  122.90MB/s    0:00:00\r"
+      pipe.receive_data "  1024000000 100%  123.67MB/s    0:00:07 (xfer#1, to-check=0/1)\n"
+      pipe.receive_data "\n"
+      pipe.receive_data "sent 1024125065 bytes  received 31 bytes  120485305.41 bytes/sec\ntotal size is 1024000000  speedup is 1.00\n"
+      pipe.output.should == "test\n  1024000000 100%  123.67MB/s    0:00:07 (xfer#1, to-check=0/1)\n\nsent 1024125065 bytes  received 31 bytes  120485305.41 bytes/sec\ntotal size is 1024000000  speedup is 1.00\n"
+    end
+  end
+
   context '#receive_data' do
     it 'should correctly do a carriage return in the output buffer' do
       EM.run do
