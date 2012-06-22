@@ -53,10 +53,10 @@ module EventMachine
             else
               cmd << ' ' << "--#{arg}"
             end
-          elsif arg.strip =~ /^\-/
+          elsif arg.is_a?(String) && arg.strip =~ /^\-/
             cmd << ' ' << arg
           else
-            cmd << ' ' << Escape.shell_single_word(arg)
+            cmd << ' ' << Escape.shell_single_word(arg.to_s)
           end
         end
         cmd

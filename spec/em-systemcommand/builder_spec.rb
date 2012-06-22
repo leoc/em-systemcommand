@@ -67,6 +67,11 @@ describe EM::SystemCommand::Builder do
       builder.to_s.should == "echo --creative='not$' 'Irgendwas\"$'"
     end
 
+    it 'should take integers as arguments' do
+      EM::SystemCommand::Builder.new('chmod', 777, 'some_file').to_s.
+        should == "chmod 777 some_file"
+    end
+
     it 'should escape argument strings' do
       EM::SystemCommand::Builder.new('echo', 'Irgendwas"$').to_s.
         should == "echo 'Irgendwas\"$'"
