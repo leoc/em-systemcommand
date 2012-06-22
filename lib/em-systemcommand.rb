@@ -48,6 +48,14 @@ module EventMachine
     end
 
     ##
+    # Get the command string from the builder object.
+    #
+    # @return [String] The command string
+    def command
+      @command.to_s
+    end
+
+    ##
     # Executes the command from the `Builder` object.
     # If there had been given a block at instantiation it will be
     # called after the `popen3` call and after the pipes have been
