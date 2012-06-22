@@ -107,16 +107,16 @@ describe EM::SystemCommand do
     end
   end
 
-  it 'should pass multiple command executions' do
+  it 'should pass multiple command executions', focus: true do
     counter = 0
     EM.run do
-      2.times do
+      10.times do
         EM::SystemCommand.execute 'ls' do |on|
           on.success do
-            2.times do
+            100.times do
               EM::SystemCommand.execute 'ls' do |on2|
                 on2.success do
-                  if counter >= 3
+                  if counter >= 999
                     EM.stop_event_loop
                   else
                     counter += 1
@@ -124,7 +124,7 @@ describe EM::SystemCommand do
                 end
 
                 on2.failure do
-                  if counter >= 3
+                  if counter >= 999
                     EM.stop_event_loop
                   else
                     counter += 1
