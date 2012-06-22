@@ -17,12 +17,20 @@ module EventMachine
         @outputbuffer.string
       end
 
-      # Convenience method to create a callback that matches a regular expression
+      ##
+      # Convenience method to create a callback that matches a regular
+      # expression
       def match regexp, opt = {}, &block
-        opt = { in: :line }.merge opt
+        opt = { in: :line, match: :first }.merge opt
         (opt[:in] == :output ? receive_update_callbacks : receive_line_callbacks) << lambda do |data|
-          if m = data.match(regexp)
-            block.call m.to_a
+          matches = data.scan regexp
+          if matches.length > 0
+            case opt[:match]
+            when :first
+              block.call *matches[0]
+            when :last
+              block.call *matches[matches.length-1]
+            end
           end
         end
       end
@@ -122,6 +130,7 @@ module EventMachine
         end
       end
 
+      ##
       # Invoked when the connection is terminated. Calls
       # `unbind(@name)` on master.
       def unbind

@@ -128,7 +128,7 @@ describe 'Pipe' do
       received = []
       EM.run do
         EM::SystemCommand.execute 'echo "-123-"; echo "-456-"' do |on|
-          on.stdout.match /-([0-9]+)-/, in: :line do |match, number|
+          on.stdout.match /-([0-9]+)-/, in: :line do |number|
             received << number
           end
 
@@ -144,7 +144,7 @@ describe 'Pipe' do
       received = []
       EM.run do
         EM::SystemCommand.execute %q{ruby -e '$stdout.sync = true; print "-123-\r"; sleep 0.1; print "-456-\r"; exit 0'} do |on|
-          on.stdout.match /-([0-9]+)-/, in: :output do |match, number|
+          on.stdout.match /-([0-9]+)-/, in: :output do |number|
             received << number
           end
 
@@ -155,5 +155,22 @@ describe 'Pipe' do
         end
       end
     end
+
+    it 'should match last occurence on receive_update' do
+      received = []
+      EM.run do
+        EM::SystemCommand.execute %q{ruby -e '$stdout.sync = true; print "-123-\n"; sleep 0.1; print "-456-\n"; exit 0'} do |on|
+          on.stdout.match /-([0-9]+)-/, match: :last, in: :output do |number|
+            received << number
+          end
+
+          on.success do
+            EM.stop_event_loop
+            received.should == ["123","456"]
+          end
+        end
+      end
+    end
+
   end
 end
