@@ -166,7 +166,7 @@ module EventMachine
             parse_cr data, icr
           else
             @linebuffer << data
-            @outputbuffer.print data
+            # @outputbuffer.print data
           end
         end
       end
