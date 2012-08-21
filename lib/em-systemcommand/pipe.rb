@@ -185,9 +185,10 @@ module EventMachine
       def close
         begin
           @io.close unless @io.closed?
-          detach
         rescue Exception => e
           # ignore errors, when the io object might be closed already
+        ensure
+          detach
         end
       end
 

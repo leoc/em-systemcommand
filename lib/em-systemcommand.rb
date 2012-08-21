@@ -107,14 +107,16 @@ module EventMachine
     # Called by child pipes when they get unbound.
     def unbind name
       pipes.delete name
-      if pipes.empty?
-        exit_callbacks.each do |cb|
-          cb.call status
-        end
-        if status.exitstatus == 0
-          succeed self
-        else
-          fail self
+      EM.next_tick do
+        if pipes.empty?
+          exit_callbacks.each do |cb|
+            cb.call status
+          end
+          if status.exitstatus == 0
+            succeed self
+          else
+            fail self
+          end
         end
       end
     end
