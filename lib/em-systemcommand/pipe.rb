@@ -111,6 +111,8 @@ module EventMachine
         ln = (@linebuffer << data[0...ix]).join
         @linebuffer.clear
 
+        ln.force_encoding("UTF-8")
+
         receive_line ln
         @outputbuffer.print ln
 
@@ -130,6 +132,8 @@ module EventMachine
         ln = (@linebuffer << data[0...ix]).join
         @linebuffer.clear
         ln.chomp!
+
+        ln.force_encoding("UTF-8")
 
         receive_line ln
         @outputbuffer.print ln
