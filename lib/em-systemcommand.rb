@@ -109,12 +109,18 @@ module EventMachine
       pipes.delete name
       if pipes.empty?
         exit_callbacks.each do |cb|
-          cb.call status
+          EM.next_tick do
+            cb.call status
+          end
         end
         if status.exitstatus == 0
-          succeed self
+          EM.next_tick do
+            succeed self
+          end
         else
-          fail self
+          EM.next_tick do
+            fail self
+          end
         end
       end
     end
