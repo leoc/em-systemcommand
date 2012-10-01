@@ -36,9 +36,13 @@ module EventMachine
           if matches.length > 0
             case opt[:match]
             when :first
-              block.call *matches[0]
+              EM.next_tick do
+                block.call *matches[0]
+              end
             when :last
-              block.call *matches[matches.length-1]
+              EM.next_tick do
+                block.call *matches[matches.length-1]
+              end
             end
           end
         end
@@ -50,7 +54,9 @@ module EventMachine
       # @param [String] line The line that´s received
       def receive_line line
         receive_line_callbacks.each do |callback|
-          callback.call line.dup
+          EM.next_tick do
+            callback.call line.dup
+          end
         end
       end
 
@@ -70,7 +76,9 @@ module EventMachine
       # @param [String] buffer The complete buffer content of this connection
       def receive_update buffer
         receive_update_callbacks.each do |callback|
-          callback.call buffer.dup
+          EM.next_tick do
+            callback.call buffer.dup
+          end
         end
       end
 
@@ -91,7 +99,9 @@ module EventMachine
         # if recursive is true we already invoked the receive data callbacks!
         unless recursive
           receive_data_callbacks.each do |callback|
-            callback.call data.dup
+            EM.next_tick do
+              callback.call data.dup
+            end
           end
         end
         @linebuffer ||= []
@@ -189,9 +199,10 @@ module EventMachine
       def close
         begin
           @io.close unless @io.closed?
-          detach
         rescue Exception => e
           # ignore errors, when the io object might be closed already
+        ensure
+          detach
         end
       end
 
