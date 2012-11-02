@@ -199,10 +199,10 @@ module EventMachine
       def close
         begin
           @io.close unless @io.closed?
+          close_connection
         rescue Exception => e
-          # ignore errors, when the io object might be closed already
-        ensure
-          detach
+          # ignore errors for instance when the connection has already
+          # been closed.
         end
       end
 
