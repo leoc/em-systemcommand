@@ -1,9 +1,7 @@
 require 'spec_helper'
 
 describe 'Pipe' do
-
   context 'parsing' do
-
     it 'should handle carriage returns' do
       cmd = EM::SystemCommand.new 'exit 0;'
       pipe = EM::SystemCommand::Pipe.new(nil, cmd, :stdout)
@@ -72,7 +70,6 @@ describe 'Pipe' do
   end
 
   context '#line callback' do
-
     it 'should be called on readline' do
       received = []
       EM.run do
@@ -125,7 +122,7 @@ describe 'Pipe' do
       end
     end
 
-    it 'should be called on carriage return'do
+    it 'should be called on carriage return' do
       received = []
       EM.run do
         EM::SystemCommand.execute %q{ruby -e '$stdout.sync = true; print "123\r"; sleep 0.1; print "456\r"; exit 0;'} do |on|
@@ -149,7 +146,7 @@ describe 'Pipe' do
       received = []
       EM.run do
         EM::SystemCommand.execute 'echo "-123-"; echo "-456-"' do |on|
-          on.stdout.match /-([0-9]+)-/, in: :line do |number|
+          on.stdout.match(/-([0-9]+)-/, in: :line) do |number|
             received << number
           end
 
@@ -165,7 +162,7 @@ describe 'Pipe' do
       received = []
       EM.run do
         EM::SystemCommand.execute %q{ruby -e '$stdout.sync = true; print "-123-\r"; sleep 0.1; print "-456-\r"; exit 0'} do |on|
-          on.stdout.match /-([0-9]+)-/, in: :output do |number|
+          on.stdout.match(/-([0-9]+)-/, in: :output) do |number|
             received << number
           end
 
@@ -181,7 +178,7 @@ describe 'Pipe' do
       received = []
       EM.run do
         EM::SystemCommand.execute %q{ruby -e '$stdout.sync = true; print "-123-\n"; sleep 0.1; print "-456-\n"; exit 0'} do |on|
-          on.stdout.match /-([0-9]+)-/, match: :last, in: :output do |number|
+          on.stdout.match(/-([0-9]+)-/, match: :last, in: :output) do |number|
             received << number
           end
 
