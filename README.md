@@ -1,5 +1,7 @@
 # EM::SystemCommand
 
+[![Gem Version](https://badge.fury.io/rb/em-systemcommand.png)](http://badge.fury.io/rb/em-systemcommand)
+
 `EM::SystemCommand` is an `popen3` abstraction for eventmachine to easily create subprocesses with eventmachine.
 The goal is to provide an easy way to invoke system commands and to read and handle their outputs. When creating an 
 `EM::SystemCommand` object its basically like a popen. It has `#stdin`, `#stdout` and `#stderr`.
