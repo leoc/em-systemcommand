@@ -31,14 +31,18 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h1>EM::SystemCommand</h1>
+        <h1>
+<a name="emsystemcommand" class="anchor" href="#emsystemcommand"><span class="octicon octicon-link"></span></a>EM::SystemCommand</h1>
+
+<p><a href="http://badge.fury.io/rb/em-systemcommand"><img src="https://badge.fury.io/rb/em-systemcommand.png" alt="Gem Version"></a></p>
 
 <p><code>EM::SystemCommand</code> is an <code>popen3</code> abstraction for eventmachine to easily create subprocesses with eventmachine.
 The goal is to provide an easy way to invoke system commands and to read and handle their outputs. When creating an 
 <code>EM::SystemCommand</code> object its basically like a popen. It has <code>#stdin</code>, <code>#stdout</code> and <code>#stderr</code>.
 Which are related to <code>EM::Connection</code>.</p>
 
-<h2>Installation</h2>
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
 <p>Add this line to your application's Gemfile:</p>
 
@@ -55,13 +59,14 @@ Which are related to <code>EM::Connection</code>.</p>
 <pre><code>$ gem install em-systemcommand
 </code></pre>
 
-<h2>Usage</h2>
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <p>To simply run a process you can instatiate an <code>EM::SystemCommand</code>
 object and set up the callbacks in the yielded block.</p>
 
 <pre><code>EM.run do
-  EM::SystemCommand 'my_command' do |on|
+  EM::SystemCommand.execute 'my_command' do |on|
     on.success do |ps|
       puts "Success!"
     end
@@ -77,7 +82,7 @@ end
 <code>#update</code>, <code>#line</code> and <code>#data</code> on a pipe object like so:</p>
 
 <pre><code>EM.run do
-  EM::SystemCommand 'my_command' do |on|
+  EM::SystemCommand.execute 'my_command' do |on|
     on.success do |ps|
       puts "Success!"
     end
@@ -104,7 +109,7 @@ end
 you match output against a regular expression:</p>
 
 <pre><code>EM.run do
-  EM::SystemCommand 'echo "25%\n"; sleep 1; echo "50%\n"; sleep 1; echo "75%\n"; sleep 1; echo "100%\n"; exit 0;' do |on|
+  EM::SystemCommand.execute 'echo "25%\n"; sleep 1; echo "50%\n"; sleep 1; echo "75%\n"; sleep 1; echo "100%\n"; exit 0;' do |on|
     on.success do |ps|
       puts "Success!"
     end
@@ -116,7 +121,8 @@ you match output against a regular expression:</p>
 end
 </code></pre>
 
-<h2>Contributing</h2>
+<h2>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
 <ol>
 <li>Fork it</li>
